@@ -59,13 +59,25 @@ pipeline {
                         passwordVariable: 'DOCKERHUB_TOKEN'
                     )
                 ]) {
-                    powershell '''
-                        $ErrorActionPreference = "Continue"
-                        $env:DOCKERHUB_TOKEN | docker login --username "$env:DOCKERHUB_USER" --password-stdin
-                        if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
-                        docker push "${env:IMAGE_NAME}:${env:IMAGE_TAG}"
-                        if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
-                    '''
+                    withEnv(["DOCKER_CONFIG=${env.WORKSPACE}\\.docker-ci"]) {
+                        powershell '''
+                            $ErrorActionPreference = "Continue"
+                            try {
+                                $u = $env:DOCKERHUB_USER.Trim()
+                                $t = $env:DOCKERHUB_TOKEN.Trim()
+                                Write-Host "User length: $($u.Length), token length: $($t.Length)"
+
+                                $t | docker login --username $u --password-stdin
+                                if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
+                                docker push "${env:IMAGE_NAME}:${env:IMAGE_TAG}"
+                                if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+                            }
+                            finally {
+                                docker logout
+                            }
+                        '''
+                    }
                 }
             }
         }
