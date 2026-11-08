@@ -14,7 +14,7 @@ pipeline {
     }
 
     environment {
-        IMAGE_NAME = 'YOUR_DOCKERHUB_USERNAME/devops-cicd-app'
+        IMAGE_NAME = 'mohammadarifsunasara/devops-cicd-app'
     }
 
     stages {
