@@ -1,4 +1,3 @@
-
 pipeline {
     agent {
         label 'windows-docker'
@@ -77,8 +76,8 @@ pipeline {
                         $ErrorActionPreference = "Stop"
 
                         $env:DOCKERHUB_TOKEN |
-                          docker login `
-                            --username "$env:DOCKERHUB_USER" `
+                          docker login 
+                            --username "$env:DOCKERHUB_USER" 
                             --password-stdin
 
                         if ($LASTEXITCODE -ne 0) {
