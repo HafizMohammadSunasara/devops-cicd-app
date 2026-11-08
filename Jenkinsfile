@@ -65,7 +65,13 @@ pipeline {
                             try {
                                 $u = $env:DOCKERHUB_USER.Trim()
                                 $t = $env:DOCKERHUB_TOKEN.Trim()
+
                                 Write-Host "User length: $($u.Length), token length: $($t.Length)"
+                                Write-Host "User: [$u]"
+                                Write-Host "Token prefix: $($t.Substring(0, [Math]::Min(9, $t.Length)))"
+                                $bytes = [Text.Encoding]::UTF8.GetBytes($t)
+                                $hash = [BitConverter]::ToString([Security.Cryptography.SHA256]::Create().ComputeHash($bytes)).Replace("-","")
+                                Write-Host "Token hash: $($hash.Substring(0,8))"
 
                                 $t | docker login --username $u --password-stdin
                                 if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
